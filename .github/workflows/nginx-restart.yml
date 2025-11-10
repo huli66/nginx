@@ -1,0 +1,34 @@
+name: Nginx Restart
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  restart-nginx:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ssh remote deploy
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            echo -e "pull conf"
+            cd /root/nginx/nginx
+            git pull origin main
+            echo -e "pull conf done"
+
+            echo -e "copy conf and html to host"
+            cp -r conf/* /root/nginx/conf/
+            cp -r html/* /root/nginx/html/
+            echo -e "copy conf and html to host done"
+
+            echo -e "restart nginx"
+            docker restart nginx
+            echo -e "restart nginx done"
+
+          host: ${{ secrets.HOST }}
+          user: ${{ secrets.USER }}
+          pass: ${{ secrets.PASSWORD }}
