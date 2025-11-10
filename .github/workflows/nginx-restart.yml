@@ -17,6 +17,8 @@ jobs:
           command: |
             echo -e "pull conf"
             cd /root/nginx/nginx
+            pwd
+            ls
             git pull origin main
             echo -e "pull conf done"
 
