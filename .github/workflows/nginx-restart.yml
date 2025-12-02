@@ -23,13 +23,19 @@ jobs:
             echo -e "pull conf done"
 
             echo -e "copy conf and html to host"
-            cp -r conf/* /root/nginx/conf/
-            cp -r html/* /root/nginx/html/
+            cp -r nginx-conf/* /root/nginx/nginx-conf/
+            cp -r nginx-html/* /root/nginx/nginx-html/
+            cp -r docker/* /root/nginx/docker/
             echo -e "copy conf and html to host done"
 
             echo -e "restart nginx"
-            docker stop nginx
-            docker run --rm -p 443:443 -p 80:80 --name nginx -v /root/nginx/ssl:/etc/nginx/ssl -v /root/nginx/conf/conf.d:/etc/nginx/conf.d -v /root/nginx/log:/var/log/nginx -v /root/nginx/html:/usr/share/nginx/html -d nginx:latest
+            # 指定 docker-compose 文件路径并先停止上次运行的服务
+            docker-compose -f /root/nginx/docker/docker-compose.yml version || true
+            docker-compose -f /root/nginx/docker/docker-compose.yml down || true
+            # 以防有残留命名为 nginx 的容器，尝试停止
+            docker ps -aq --filter "name=nginx" | xargs -r docker stop || true
+            # 重新以指定 compose 文件启动，-f 指定文件，-d 后台运行，--remove-orphans
+            docker-compose -f /root/nginx/docker/docker-compose.yml up -d --remove-orphans
             echo -e "restart nginx done"
 
           host: ${{ secrets.HOST }}
