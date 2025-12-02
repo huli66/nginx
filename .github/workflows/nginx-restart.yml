@@ -23,9 +23,11 @@ jobs:
             echo -e "pull conf done"
 
             echo -e "copy conf and html to host"
-            cp -r nginx-conf/* /root/nginx/nginx-conf/
-            cp -r nginx-html/* /root/nginx/nginx-html/
-            cp -r docker/* /root/nginx/docker/
+            mkdir -p /root/nginx
+            rm -rf /root/nginx/nginx-conf /root/nginx/nginx-html /root/nginx/docker || true
+            cp -a nginx-conf /root/nginx/
+            cp -a nginx-html /root/nginx/
+            cp -a docker /root/nginx/
             echo -e "copy conf and html to host done"
 
             echo -e "restart nginx"
